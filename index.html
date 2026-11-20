@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FEF7FF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141218" media="(prefers-color-scheme: dark)">
+<title>متجر المطور عبد الحي</title>
+<link rel="preconnect" href="https://appp-1e19d-default-rtdb.firebaseio.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Material 3 baseline tonal palette */
+:root{
+--surface:#FEF7FF;--on-surface:#1D1B20;--on-surface-variant:#49454F;
+--primary:#6750A4;--on-primary:#FFF;--primary-container:#EADDFF;--on-primary-container:#21005D;
+--secondary-container:#E8DEF8;--on-secondary-container:#1D192B;
+--sc:#F3EDF7;--sc-high:#ECE6F0;--sc-highest:#E6E0E9;
+--outline:#79747E;--outline-variant:#CAC4D0;--error:#B3261E;
+--inverse-surface:#322F35;--inverse-on-surface:#F5EFF7;
+color-scheme:light}
+@media (prefers-color-scheme:dark){:root{
+--surface:#141218;--on-surface:#E6E0E9;--on-surface-variant:#CAC4D0;
+--primary:#D0BCFF;--on-primary:#381E72;--primary-container:#4F378B;--on-primary-container:#EADDFF;
+--secondary-container:#4A4458;--on-secondary-container:#E8DEF8;
+--sc:#211F26;--sc-high:#2B2930;--sc-highest:#36343B;
+--outline:#938F99;--outline-variant:#49454F;--error:#F2B8B5;
+--inverse-surface:#E6E0E9;--inverse-on-surface:#322F35;color-scheme:dark}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Cairo','Roboto',system-ui,sans-serif;background:var(--surface);color:var(--on-surface);min-height:100vh;min-height:100dvh}
+svg{width:24px;height:24px;fill:currentColor;flex-shrink:0}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+/* state layer */
+.sl{position:relative;overflow:hidden}
+.sl::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s;pointer-events:none}
+.sl:hover::after{opacity:.08}.sl:active::after,.sl:focus-visible::after{opacity:.12}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+/* top app bar */
+.top{position:sticky;top:0;z-index:10;background:var(--surface);padding:12px 16px 8px}
+.top h1{font-size:1.375rem;font-weight:600;text-align:center;padding:8px 0 12px}
+.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;border-radius:28px;background:var(--sc-high);max-width:720px;margin:0 auto;color:var(--on-surface-variant)}
+.search input{flex:1;min-width:0;border:0;background:none;outline:0;font:inherit;font-size:1rem;color:var(--on-surface)}
+.search input::placeholder{color:var(--on-surface-variant)}
+.search .x{width:40px;height:40px;border-radius:50%;display:none;align-items:center;justify-content:center;margin-inline-end:-8px}
+.search.has .x{display:flex}
+main{max-width:720px;margin:0 auto;padding:8px 16px 104px}
+.view{display:none}.view.on{display:block}
+/* list */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:16px;padding:12px 16px;border-radius:16px;background:var(--sc);text-align:start;width:100%}
+.ic{width:56px;height:56px;border-radius:14px;background:var(--primary-container);color:var(--on-primary-container);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;object-fit:cover;flex-shrink:0;overflow:hidden}
+.ic img{width:100%;height:100%;object-fit:cover;display:block}
+.txt{flex:1;min-width:0}
+.t{font-size:1rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s{font-size:.8125rem;color:var(--on-surface-variant);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{color:var(--on-surface-variant)}
+.sk{height:80px;border-radius:16px;background:linear-gradient(90deg,var(--sc) 25%,var(--sc-high) 50%,var(--sc) 75%);background-size:200% 100%;animation:sh 1.2s infinite linear}
+@keyframes sh{to{background-position:-200% 0}}
+.empty{text-align:center;color:var(--on-surface-variant);padding:48px 16px;line-height:1.8}
+.empty button{margin-top:12px}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:24px;font-weight:600;font-size:.95rem}
+.filled{background:var(--primary);color:var(--on-primary)}
+.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
+.text{color:var(--primary)}
+/* bottom sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.32);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;inset-inline:0;bottom:0;margin:0 auto;max-width:640px;max-height:88dvh;overflow:auto;background:var(--sc);border-radius:28px 28px 0 0;padding:12px 24px 28px;transform:translateY(105%);transition:transform .3s cubic-bezier(.2,0,0,1);z-index:50}
+.sheet.on{transform:none}
+.handle{width:32px;height:4px;border-radius:2px;background:var(--outline);opacity:.4;margin:0 auto 20px}
+.hero{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.hero .ic{width:72px;height:72px;border-radius:20px;font-size:2rem}
+.hero .t{font-size:1.375rem;white-space:normal}
+.pkg{direction:ltr;text-align:start}
+.dl{width:100%}
+.prog{display:none;margin-top:4px}
+.prog.on{display:block}
+.bar{height:4px;border-radius:2px;background:var(--secondary-container);overflow:hidden;position:relative}
+.bar i{position:absolute;inset-block:0;inset-inline-start:0;width:0;background:var(--primary);border-radius:2px;transition:width .15s}
+.bar.ind i{width:35%;animation:ind 1.2s infinite ease-in-out}
+@keyframes ind{0%{inset-inline-start:-35%}100%{inset-inline-start:100%}}
+.pr{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:.8125rem;color:var(--on-surface-variant)}
+h2.h{font-size:1rem;font-weight:600;margin:24px 0 8px}
+.desc{color:var(--on-surface-variant);line-height:1.8;font-size:.9375rem;white-space:pre-line}
+/* about */
+.about{text-align:center;padding:24px 8px}
+.av{width:96px;height:96px;border-radius:50%;background:var(--primary-container);color:var(--on-primary-container);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;margin:0 auto 16px}
+.about h2{font-size:1.75rem;font-weight:600}
+.role{color:var(--primary);font-weight:600;margin:4px 0 16px}
+.bio{color:var(--on-surface-variant);line-height:1.9;margin-bottom:24px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.chip{height:32px;display:inline-flex;align-items:center;padding:0 16px;border-radius:8px;border:1px solid var(--outline);font-size:.875rem;font-weight:500}
+/* navigation bar */
+nav{position:fixed;inset-inline:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:8px;height:80px;padding:12px 8px 16px;background:var(--sc);padding-bottom:max(16px,env(safe-area-inset-bottom))}
+nav button{flex:1;max-width:200px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.75rem;font-weight:500;color:var(--on-surface-variant)}
+nav button.sl::after{display:none}
+nav button:focus-visible{outline:none}
+nav .pill{position:relative;overflow:hidden;width:64px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+nav .pill::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s}
+nav button:active .pill::after{opacity:.12}
+nav button[aria-selected=true]{color:var(--on-surface);font-weight:700}
+nav button[aria-selected=true] .pill{background:var(--secondary-container);color:var(--on-secondary-container)}
+/* snackbar */
+.snack{position:fixed;inset-inline:16px;bottom:96px;margin:0 auto;max-width:480px;background:var(--inverse-surface);color:var(--inverse-on-surface);padding:14px 16px;border-radius:4px;font-size:.875rem;z-index:60;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}
+.snack.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>متجر عبد الحي</h1>
+  <label class="search" id="sb">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <input id="q" type="search" placeholder="ابحث في التطبيقات" autocomplete="off">
+    <button class="x sl" id="qx" aria-label="مسح"><svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+  </label>
+</header>
+
+<main>
+  <section class="view on" id="v-store"><div class="list" id="list"></div></section>
+  <section class="view" id="v-about">
+    <div class="about">
+      <div class="av">ع</div>
+      <h2>المطور عبد الحي</h2>
+      <div class="role">مطور تطبيقات أندرويد ومواقع ويب</div>
+      <p class="bio">أصمم وأطور تطبيقات أندرويد ومواقع ويب سريعة بواجهات Material Design 3. تجد هنا أحدث تطبيقاتي جاهزة للتنزيل المباشر.</p>
+      <div class="chips"><span class="chip">تطبيقات Android</span><span class="chip">مواقع HTML/CSS/JS</span><span class="chip">Firebase</span><span class="chip">Material Design 3</span></div>
+    </div>
+  </section>
+</main>
+
+<nav role="tablist">
+  <button class="sl" role="tab" id="n-store" aria-selected="true" data-t="store"><span class="pill"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg></span>التطبيقات</button>
+  <button class="sl" role="tab" id="n-about" aria-selected="false" data-t="about"><span class="pill"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>حول المطور</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="handle"></div>
+  <div class="hero"><div class="ic" id="mi"></div><div class="txt"><div class="t" id="mt"></div><div class="s pkg" id="mp"></div></div></div>
+  <button class="btn filled dl sl" id="dl"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg><span>تنزيل التطبيق</span></button>
+  <div class="prog" id="prog">
+    <div class="bar" id="bar"><i id="fill"></i></div>
+    <div class="pr"><span id="ptxt"></span><button class="btn text sl" id="cancel" style="height:36px;padding:0 12px">إلغاء</button></div>
+  </div>
+  <h2 class="h">عن التطبيق</h2>
+  <p class="desc" id="md"></p>
+</div>
+<div class="snack" id="snack" role="status"></div>
+
+<script>
+const DB='https://appp-1e19d-default-rtdb.firebaseio.com', PATH='', KEY='abd_apps_v3';
+const $=id=>document.getElementById(id);
+let apps=[], ctrl=null, busy=false;
+
+/* ---------- helpers ---------- */
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function icon(app){
+  const d=el('div','ic'), ch=(app.appName||'?').trim().charAt(0);
+  if(app.iconUrl){const i=new Image();i.alt='';i.decoding='async';i.loading='lazy';i.src=app.iconUrl;i.onerror=()=>{i.remove();d.textContent=ch};d.appendChild(i)}else d.textContent=ch;
+  return d}
+let st;function toast(m){const s=$('snack');s.textContent=m;s.classList.add('on');clearTimeout(st);st=setTimeout(()=>s.classList.remove('on'),3500)}
+const mb=n=>(n/1048576).toFixed(1);
+
+/* ---------- data (REST: no Firebase SDK, cached for instant start) ---------- */
+function collect(n,out,d){
+  if(!n||typeof n!=='object'||d>3)return;
+  if(n.appName&&String(n.appName).trim()){out.push(n);return}
+  for(const k in n)collect(n[k],out,d+1)}
+function skeleton(){const l=$('list');l.replaceChildren();for(let i=0;i<6;i++)l.appendChild(el('div','sk'))}
+function render(){
+  const q=$('q').value.toLowerCase().trim(), l=$('list'), f=document.createDocumentFragment();
+  const rows=q?apps.filter(a=>String(a.appName).toLowerCase().includes(q)):apps;
+  if(!rows.length){const e=el('div','empty',q?'لا توجد نتائج مطابقة لبحثك.':'لا توجد تطبيقات حاليا.');l.replaceChildren(e);return}
+  rows.forEach(a=>{
+    const b=el('button','item sl');b.appendChild(icon(a));
+    const t=el('div','txt');t.append(el('div','t',a.appName),el('div','s','تطبيق جاهز للتنزيل'));b.appendChild(t);
+    b.insertAdjacentHTML('beforeend','<svg class="chev" viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>');
+    b.onclick=()=>openSheet(a);f.appendChild(b)});
+  l.replaceChildren(f)}
+async function load(){
+  let cached=null;
+  try{cached=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+  if(cached&&cached.length){apps=cached;render()}else skeleton();
+  try{
+    const r=await fetch(`${DB}/${PATH}.json`);
+    if(!r.ok)throw new Error(r.status===401||r.status===403?'صلاحية القراءة غير مفعلة في قواعد Firebase':'خطأ '+r.status);
+    const out=[];collect(await r.json(),out,0);out.reverse();
+    if(JSON.stringify(out)!==JSON.stringify(apps)){apps=out;render()}
+    try{localStorage.setItem(KEY,JSON.stringify(out))}catch(e){}
+  }catch(err){
+    if(!apps.length){
+      const e=el('div','empty','تعذر تحميل التطبيقات.\n'+(err.message||''));e.style.whiteSpace='pre-line';
+      const b=el('button','btn tonal sl','إعادة المحاولة');b.onclick=()=>{skeleton();load()};e.appendChild(el('br'));e.appendChild(b);
+      $('list').replaceChildren(e)}
+    else toast('تعذر التحديث، تعرض نسخة محفوظة')}}
+
+/* ---------- details sheet ---------- */
+function openSheet(a){
+  $('mt').textContent=a.appName;$('mp').textContent=a.packageName||'';
+  $('md').textContent=a.appDescription||'لا يوجد وصف لهذا التطبيق.';
+  const mi=$('mi'),ch=(a.appName||'?').trim().charAt(0);mi.textContent=ch;
+  if(a.iconUrl){const i=new Image();i.alt='';i.decoding='async';i.src=a.iconUrl;i.onload=()=>mi.replaceChildren(i);}
+  $('dl').onclick=()=>download(a);
+  resetProg();$('scrim').classList.add('on');$('sheet').classList.add('on')}
+function closeSheet(){if(ctrl)ctrl.abort();$('scrim').classList.remove('on');$('sheet').classList.remove('on')}
+function resetProg(){busy=false;$('prog').classList.remove('on');$('dl').style.display='';$('fill').style.width='0'}
+
+/* ---------- download inside the page, then hand the file to the browser ---------- */
+async function download(a){
+  const url=a.downloadUrl;if(!url){toast('لا يوجد رابط تنزيل لهذا التطبيق');return}
+  if(busy)return;busy=true;ctrl=new AbortController();
+  $('dl').style.display='none';$('prog').classList.add('on');
+  const bar=$('bar'),fill=$('fill'),txt=$('ptxt');
+  bar.classList.add('ind');fill.style.width='';txt.textContent='جاري الاتصال...';
+  try{
+    const res=await fetch(url,{signal:ctrl.signal});
+    if(!res.ok)throw new Error('http '+res.status);
+    const total=+res.headers.get('content-length')||0, parts=[];let got=0;
+    if(total){bar.classList.remove('ind');fill.style.width='0'}
+    const rd=res.body.getReader();
+    for(;;){
+      const {done,value}=await rd.read();if(done)break;
+      parts.push(value);got+=value.length;
+      if(total){fill.style.width=(got/total*100).toFixed(1)+'%';txt.textContent=Math.floor(got/total*100)+'% • '+mb(got)+' من '+mb(total)+' ميغابايت'}
+      else txt.textContent='تم تنزيل '+mb(got)+' ميغابايت'}
+    let fn='';try{fn=decodeURIComponent(new URL(url,location.href).pathname.split('/').pop()||'')}catch(e){}
+    if(!/\.\w{2,5}$/.test(fn))fn=a.appName+'.apk';
+    const isApk=/\.apk$/i.test(fn);
+    const blob=new Blob(parts,{type:isApk?'application/vnd.android.package-archive':(res.headers.get('content-type')||'application/octet-stream')});
+    const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=fn;
+    document.body.appendChild(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(link.href),60000);
+    toast('اكتمل التنزيل');resetProg();
+  }catch(err){
+    if(err.name==='AbortError'){toast('تم إلغاء التنزيل');resetProg()}
+    else{ // CORS or network: let the browser download it directly
+      resetProg();toast('تعذر التنزيل داخل الصفحة، سيتم فتح الرابط مباشرة');
+      setTimeout(()=>window.open(url,'_blank','noopener'),700)}
+  }finally{ctrl=null}}
+
+/* ---------- events ---------- */
+$('cancel').onclick=()=>{if(ctrl)ctrl.abort()};
+$('scrim').onclick=closeSheet;
+addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+$('q').addEventListener('input',()=>{$('sb').classList.toggle('has',!!$('q').value);render()});
+$('qx').onclick=e=>{e.preventDefault();$('q').value='';$('sb').classList.remove('has');render();$('q').focus()};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  const t=b.dataset.t;
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  $('v-store').classList.toggle('on',t==='store');$('v-about').classList.toggle('on',t==='about');
+  $('sb').style.display=t==='store'?'':'none';scrollTo(0,0)});
+load();
+</script>
+</body>
+</html>
